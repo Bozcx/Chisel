@@ -1731,6 +1731,7 @@ public class MapperView : IEditorScene
     {
         var index = EntityDataIndex.Read(GlobalEditorData.EDSFile);
 
+        GlobalEditorData.MaterialsPath = index.MaterialsPath;
         MaterialLoader.MountMaterials(index.MaterialsPath);
         GlobalMapData.MaterialNameToIndex = new Dictionary<string, int>();
 

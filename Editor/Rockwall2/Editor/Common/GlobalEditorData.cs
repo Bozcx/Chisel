@@ -22,6 +22,17 @@ public static class GlobalEditorData
 
     static readonly string[] RawExtensions = { ".png", ".jpg", ".jpeg", ".tga" };
 
+    public static string MaterialsPath = "";
+    public static string MaterialSourceRoot
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(WorkingDirectory)) return MaterialsPath;
+            string source = Path.Combine(WorkingDirectory, "Materials");
+            return Directory.Exists(source) ? source : MaterialsPath;
+        }
+    }
+
     public static void LoadTex(bool forceReload = false)
     {
         if (texturesLoaded && !forceReload) return;
@@ -71,7 +82,7 @@ public static class GlobalEditorData
 
         texturesLoaded = true;
     }
-    static Bitmap LoadThumbnail(string textureName, int thumbnailSize)
+    public static Bitmap LoadThumbnail(string textureName, int thumbnailSize)
     {
         foreach (var ext in RawExtensions)
         {

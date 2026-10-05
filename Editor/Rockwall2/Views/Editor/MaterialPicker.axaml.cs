@@ -37,19 +37,7 @@ public partial class MaterialPicker : Window
         if (Design.IsDesignMode) return;
 
         textureList.ItemsSource = filteredItems;
-        foreach (var img in GlobalEditorData.TexturesAsImages)
-        {
-            allItems.Add(img);
-        }
-
-        cachedDistinctPaths ??= allItems
-            .Select(i => i.RelativePath)
-            .Where(p => !string.IsNullOrEmpty(p))
-            .Distinct()
-            .OrderBy(p => p)
-            .ToList();
-
-        pathFilterBox.ItemsSource = cachedDistinctPaths;
+        LoadItems();
 
         state ??= new MaterialPickerState();
 
@@ -102,6 +90,34 @@ public partial class MaterialPicker : Window
         }
 
         return instance.pendingResult.Task;
+    }
+
+    private void LoadItems()
+    {
+        allItems.Clear();
+        foreach (var img in GlobalEditorData.TexturesAsImages)
+        {
+            allItems.Add(img);
+        }
+
+        cachedDistinctPaths ??= allItems
+            .Select(i => i.RelativePath)
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Distinct()
+            .OrderBy(p => p)
+            .ToList();
+
+        pathFilterBox.ItemsSource = cachedDistinctPaths;
+    }
+
+    public static void RefreshMaterials()
+    {
+        cachedDistinctPaths = null;
+        if (instance == null) return;
+
+        instance.SelectItem(null);
+        instance.LoadItems();
+        instance.ApplyFilters();
     }
 
     private void ApplyFilters()

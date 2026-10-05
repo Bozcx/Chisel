@@ -181,6 +181,12 @@
 #begin Shaders/ModelCommon.fxh
 /copy:Shaders/ModelCommon.fxh
 
+#begin Shaders/MaterialPreview.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/MaterialPreview.fx
+
 #begin Shaders/ModelDefault.fx
 /importer:EffectImporter
 /processor:EffectProcessor

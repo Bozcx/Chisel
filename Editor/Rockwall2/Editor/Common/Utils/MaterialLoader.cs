@@ -26,7 +26,7 @@ public static class MaterialLoader
             var mat = JsonConvert.DeserializeObject<Material>(File.ReadAllText(file));
             materials.Add(mat);
 
-            matNames.Add(mat.Name, GlobalMapData.LoadedMaterials?.Length ?? 0 + count);
+            matNames.Add(mat.Name, (GlobalMapData.LoadedMaterials?.Length ?? 0) + count);
             count++;
         }
 

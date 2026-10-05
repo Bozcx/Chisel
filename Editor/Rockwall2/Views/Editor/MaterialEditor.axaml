@@ -2,11 +2,263 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:local="clr-namespace:Rockwall2"
+             xmlns:monoGame="clr-namespace:AvaloniaInside.MonoGame"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              x:Class="Rockwall2.MaterialEditor">
-  <Border Margin="10"
-          BorderBrush="#303030"
-          BorderThickness="1">
-    
-  </Border>
+
+	<UserControl.Background>
+		<LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+			<GradientStop Offset="0" Color="#101010"/>
+			<GradientStop Offset="1" Color="#202020"/>
+		</LinearGradientBrush>
+	</UserControl.Background>
+
+	<UserControl.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="FontSize" Value="11"/>
+		</Style>
+		<Style Selector="TextBlock.label">
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Foreground" Value="#B0B0B0"/>
+		</Style>
+		<Style Selector="TextBlock.section">
+			<Setter Property="FontSize" Value="12"/>
+			<Setter Property="FontWeight" Value="SemiBold"/>
+			<Setter Property="Margin" Value="0,0,0,6"/>
+		</Style>
+		<Style Selector="TextBlock.hint">
+			<Setter Property="FontSize" Value="10"/>
+			<Setter Property="Foreground" Value="#808080"/>
+			<Setter Property="TextWrapping" Value="Wrap"/>
+		</Style>
+		<Style Selector="Button">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="Padding" Value="6,1"/>
+			<Setter Property="MinHeight" Value="20"/>
+			<Setter Property="Height" Value="20"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="TextBox">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="Padding" Value="4,1"/>
+			<Setter Property="MinHeight" Value="20"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="AutoCompleteBox">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="MinHeight" Value="20"/>
+		</Style>
+		<Style Selector="NumericUpDown">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="MinHeight" Value="20"/>
+		</Style>
+		<Style Selector="CheckBox">
+			<Setter Property="FontSize" Value="11"/>
+			<Setter Property="MinHeight" Value="18"/>
+		</Style>
+		<Style Selector="ListBoxItem">
+			<Setter Property="Padding" Value="4,2"/>
+			<Setter Property="MinHeight" Value="18"/>
+		</Style>
+		<Style Selector="Border.panel">
+			<Setter Property="Background" Value="#181818"/>
+			<Setter Property="BorderBrush" Value="#2A2A2A"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="CornerRadius" Value="3"/>
+			<Setter Property="Padding" Value="10"/>
+			<Setter Property="Margin" Value="0,0,0,8"/>
+		</Style>
+		<Style Selector="GridSplitter">
+			<Setter Property="Background" Value="#303030"/>
+		</Style>
+	</UserControl.Styles>
+
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="280" MinWidth="180"/>
+			<ColumnDefinition Width="4"/>
+			<ColumnDefinition Width="*" MinWidth="420"/>
+			<ColumnDefinition Width="4"/>
+			<ColumnDefinition Width="420" MinWidth="240"/>
+		</Grid.ColumnDefinitions>
+
+		<!-- Material browser -->
+		<DockPanel Grid.Column="0" Margin="8">
+			<TextBox x:Name="searchBox"
+					 DockPanel.Dock="Top"
+					 Watermark="Search materials"
+					 Margin="0,0,0,6"
+					 TextChanged="SearchBox_TextChanged"/>
+
+			<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="0,6,0,0">
+				<Button Content="New" Click="NewButton_Click"/>
+				<Button Content="Duplicate" Click="DuplicateButton_Click"/>
+				<Button Content="Delete" Click="DeleteButton_Click"/>
+				<Button Content="Refresh" Click="RefreshButton_Click"
+						ToolTip.Tip="Re-scan the materials folder"/>
+			</StackPanel>
+
+			<TextBlock x:Name="rootLabel" DockPanel.Dock="Bottom" Classes="hint" Margin="0,6,0,0"/>
+
+			<ListBox x:Name="materialList"
+					 Background="#141414"
+					 SelectionMode="Single"
+					 SelectionChanged="MaterialList_SelectionChanged">
+				<ListBox.ItemTemplate>
+					<DataTemplate x:DataType="local:MaterialListEntry">
+						<Grid ColumnDefinitions="36,*">
+							<Border Width="32" Height="32" Background="#0C0C0C" CornerRadius="2">
+								<Image Source="{Binding Thumbnail}" Stretch="UniformToFill"/>
+							</Border>
+							<StackPanel Grid.Column="1" Margin="6,0,0,0" VerticalAlignment="Center">
+								<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+								<TextBlock Text="{Binding RelativePath}" Classes="hint" TextTrimming="CharacterEllipsis"/>
+							</StackPanel>
+						</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</DockPanel>
+
+		<GridSplitter Grid.Column="1" ResizeDirection="Columns"/>
+
+		<DockPanel Grid.Column="2">
+			<Border DockPanel.Dock="Bottom" Background="#151515" BorderBrush="#2A2A2A" BorderThickness="0,1,0,0" Padding="8,4">
+				<Grid ColumnDefinitions="*,Auto">
+					<TextBlock x:Name="statusText" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+					<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+						<Button x:Name="revertButton" Content="Revert" Click="RevertButton_Click"/>
+						<Button x:Name="saveButton" Content="Save" Click="SaveButton_Click"
+								ToolTip.Tip="Ctrl+S"/>
+					</StackPanel>
+				</Grid>
+			</Border>
+
+			<Panel>
+				<TextBlock x:Name="emptyText"
+						   Text="Select a material on the left, or create a new one."
+						   HorizontalAlignment="Center" VerticalAlignment="Center"
+						   Foreground="#707070"/>
+
+				<ScrollViewer x:Name="editorScroll" IsVisible="False" HorizontalScrollBarVisibility="Disabled">
+					<StackPanel Margin="12" MaxWidth="900" HorizontalAlignment="Left">
+
+						<Grid ColumnDefinitions="Auto,*" Margin="0,0,0,10">
+							<Border Width="128" Height="128" Background="#0C0C0C" BorderBrush="#2A2A2A" BorderThickness="1" CornerRadius="3">
+								<Panel>
+									<Image x:Name="previewImage" Stretch="Uniform"/>
+									<TextBlock x:Name="previewMissing" Text="No albedo" Classes="hint"
+											   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+								</Panel>
+							</Border>
+							<StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" Spacing="4">
+								<TextBlock x:Name="titleText" FontSize="18" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+								<TextBlock x:Name="pathText" Classes="hint" TextTrimming="CharacterEllipsis"/>
+							</StackPanel>
+						</Grid>
+
+						<Border Classes="panel">
+							<StackPanel>
+								<TextBlock Text="General" Classes="section"/>
+								<Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6">
+									<TextBlock Grid.Row="0" Text="Name" Classes="label"/>
+									<TextBox Grid.Row="0" Grid.Column="1" x:Name="nameBox" TextChanged="NameBox_TextChanged"/>
+
+									<TextBlock Grid.Row="1" Text="Surface type" Classes="label"
+											   ToolTip.Tip="Used by gameplay code for footsteps, impacts, etc."/>
+									<AutoCompleteBox Grid.Row="1" Grid.Column="1" x:Name="surfaceBox"
+													 FilterMode="StartsWith" MinimumPrefixLength="0"
+													 TextChanged="SurfaceBox_TextChanged"/>
+
+									<TextBlock Grid.Row="2" Text="Reflectivity" Classes="label"/>
+									<Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="*,70">
+										<Slider x:Name="reflectivitySlider" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.1"
+												VerticalAlignment="Center" Margin="0,-8"
+												ValueChanged="ReflectivitySlider_ValueChanged"/>
+										<NumericUpDown Grid.Column="1" x:Name="reflectivityBox" Minimum="0" Increment="0.05"
+													   FormatString="0.###" Margin="8,0,0,0" ShowButtonSpinner="False"
+													   ValueChanged="ReflectivityBox_ValueChanged"/>
+									</Grid>
+
+									<TextBlock Grid.Row="3" Text="Texels per unit" Classes="label"
+											   ToolTip.Tip="Texture density used for UV scaling. 0 uses the default (512)."/>
+									<StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+										<NumericUpDown x:Name="texelsBox" Minimum="0" Maximum="65536" Increment="16"
+													   FormatString="0" Width="150"
+													   ValueChanged="TexelsBox_ValueChanged"/>
+										<TextBlock Text="0 = default (512)" Classes="hint" VerticalAlignment="Center"/>
+									</StackPanel>
+								</Grid>
+							</StackPanel>
+						</Border>
+
+						<Border Classes="panel">
+							<StackPanel>
+								<TextBlock Text="Rendering" Classes="section"/>
+								<StackPanel Orientation="Horizontal" Spacing="16" Margin="0,0,0,6">
+									<CheckBox x:Name="transparentCheck" Content="Transparent" IsCheckedChanged="RenderFlag_Changed"/>
+									<CheckBox x:Name="alphaClipCheck" Content="Alpha clip" IsCheckedChanged="RenderFlag_Changed"
+											  ToolTip.Tip="Discard pixels below the alpha cutoff (foliage, fences)."/>
+									<CheckBox x:Name="noCullCheck" Content="No cull" IsCheckedChanged="RenderFlag_Changed"
+											  ToolTip.Tip="Render both sides of faces."/>
+								</StackPanel>
+								<Grid ColumnDefinitions="120,*">
+									<TextBlock Text="Shader" Classes="label"
+											   ToolTip.Tip="Name of a material shader under Shaders/. Leave blank for the default world shader."/>
+									<TextBox Grid.Column="1" x:Name="shaderBox" Watermark="(default world shader)"
+											 TextChanged="ShaderBox_TextChanged"/>
+								</Grid>
+							</StackPanel>
+						</Border>
+
+						<Border Classes="panel">
+							<StackPanel>
+								<Grid ColumnDefinitions="*,Auto">
+									<TextBlock Text="Textures" Classes="section"/>
+									<Button Grid.Column="1" Content="Add slot" Click="AddTextureSlot_Click"
+											ToolTip.Tip="Extra slots are bound to the shader as a sampler with the same name."/>
+								</Grid>
+								<StackPanel x:Name="textureRows" Spacing="6"/>
+							</StackPanel>
+						</Border>
+
+						<Border Classes="panel">
+							<StackPanel>
+								<Grid ColumnDefinitions="*,Auto">
+									<TextBlock Text="Shader flags" Classes="section"/>
+									<Button Grid.Column="1" x:Name="addFlagButton" Content="Add flag" Click="AddFlag_Click"/>
+								</Grid>
+								<StackPanel x:Name="flagRows" Spacing="4"/>
+								<TextBlock x:Name="noFlagsText" Text="No shader flags set." Classes="hint"/>
+							</StackPanel>
+						</Border>
+
+					</StackPanel>
+				</ScrollViewer>
+			</Panel>
+		</DockPanel>
+
+		<GridSplitter Grid.Column="3" ResizeDirection="Columns"/>
+
+		<DockPanel Grid.Column="4" Margin="8">
+			<Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,6">
+				<TextBlock Text="Preview" Classes="section" VerticalAlignment="Center" Margin="0"/>
+				<ComboBox Grid.Column="1" x:Name="shapeBox" SelectedIndex="0" Width="90" Margin="0,0,6,0"
+						  SelectionChanged="ShapeBox_SelectionChanged">
+					<ComboBoxItem Content="Sphere"/>
+					<ComboBoxItem Content="Cube"/>
+					<ComboBoxItem Content="Plane"/>
+				</ComboBox>
+				<Button Grid.Column="2" Content="Reset light" Click="ResetLight_Click"/>
+			</Grid>
+
+			<TextBlock DockPanel.Dock="Bottom" Classes="hint" Margin="0,6,0,0"
+					   Text="Left drag: orbit   Shift + left drag: pan   Scroll: zoom   Right drag: move light"/>
+
+			<Border BorderBrush="#303030" BorderThickness="1">
+				<monoGame:MonoGameControl x:Name="previewControl"/>
+			</Border>
+		</DockPanel>
+	</Grid>
 </UserControl>

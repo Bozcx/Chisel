@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
-        
+
         // dumb background thread... DIE!!
         // there must be a better way to do this, but its a weird recent bug of some lingering thread
         // and it's too close to release to be assed to scan everything I've added in the past month lol.
@@ -196,5 +196,30 @@ public partial class MainWindow : Window
     private void PartSave(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         FileHandler.SaveParticleAs();
+    }
+
+    private void MatNew(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        materialEditor.NewMaterial();
+    }
+    private void MatDuplicate(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        materialEditor.DuplicateMaterial();
+    }
+    private void MatDelete(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        materialEditor.DeleteMaterial();
+    }
+    private async void MatSave(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        await materialEditor.SaveMaterial();
+    }
+    private async void MatSaveAs(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        await materialEditor.SaveMaterialAs();
+    }
+    private void MatRefresh(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        materialEditor.RefreshList();
     }
 }

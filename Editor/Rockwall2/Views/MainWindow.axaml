@@ -113,26 +113,33 @@
 						</Panel>
 					</Grid>
 				</TabItem>
-				<!--
-        <TabItem Header="Material Editor">
+				<TabItem Header="Material Editor">
 
-          <Grid>
+					<Grid>
 
-            <Grid.RowDefinitions>
-              <RowDefinition Height="12"/>
-              <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="12"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="24"/>
+						</Grid.RowDefinitions>
 
-            <Menu VerticalAlignment="Stretch" Margin="8" Grid.Row="0" FontSize="12">
-              <MenuItem Header="File">
-              </MenuItem>
-            </Menu>
-            <Panel Grid.Row="1" Margin="10">
-              <controls:MaterialEditor HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="materialEditor"/>
-            </Panel>
-          </Grid>
-        </TabItem>
-        -->
+						<Menu VerticalAlignment="Stretch" Margin="8" Grid.Row="0" FontSize="12">
+							<MenuItem Header="File">
+								<MenuItem Header="New Material" Click="MatNew"/>
+								<MenuItem Header="Duplicate Material" Click="MatDuplicate"/>
+								<MenuItem Header="Delete Material" Click="MatDelete"/>
+								<Separator/>
+								<MenuItem Header="Save Material" Click="MatSave" InputGesture="Ctrl+S"/>
+								<MenuItem Header="Save Material As" Click="MatSaveAs"/>
+								<Separator/>
+								<MenuItem Header="Refresh Material List" Click="MatRefresh"/>
+							</MenuItem>
+						</Menu>
+						<Panel Grid.Row="1">
+							<controls:MaterialEditor HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="materialEditor"/>
+						</Panel>
+					</Grid>
+				</TabItem>
 			</TabControl>
 		</DockPanel>
 	</Border>
